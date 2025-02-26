@@ -1,0 +1,27 @@
+### Get all watches
+GET http://localhost:8080/api/watches
+Accept: application/json
+
+### Get a watch by ID
+GET http://localhost:8080/api/watches/3
+Accept: application/json
+
+### Add a new watch
+POST http://localhost:8080/api/watches
+Content-Type: application/json
+
+{
+  "name": "Casio",
+  "price": 150,
+  "imageUrl": ""
+}
+
+### Delete a watch by ID
+DELETE http://localhost:8080/api/watches/4
+
+### Check the image
+GET http://localhost:8080/api/watches/images/casio.jpg
+
+
+
+
