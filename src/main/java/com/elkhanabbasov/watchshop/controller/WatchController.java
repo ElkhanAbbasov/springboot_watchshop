@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/watches")  //Base
+@CrossOrigin(origins = "http://localhost:3000")
 public class WatchController {
 
     private final WatchService watchService;
@@ -36,11 +37,46 @@ public class WatchController {
         return (watch != null) ? ResponseEntity.ok(watch) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping
-    public ResponseEntity<Watch> addWatch(@RequestBody Watch watch) {
-        Watch savedWatch = watchService.addWatch(watch);
-        return ResponseEntity.ok(savedWatch);
+//    @PostMapping
+//    public ResponseEntity<Watch> addWatch(@RequestBody Watch watch) {
+//        Watch savedWatch = watchService.addWatch(watch);
+//        return ResponseEntity.ok(savedWatch);
+//    }
+
+    @PostMapping("/add")
+    public ResponseEntity<Watch> addWatch(
+            @RequestParam("name") String name,
+            @RequestParam("price") int price,
+            @RequestParam(value = "file", required = false) MultipartFile file) {
+        try {
+            String imagePath = null;
+
+            // Save file if provided
+            if (file != null && !file.isEmpty()) {
+                Path uploadDir = Paths.get("").toAbsolutePath().resolve("uploads");
+                Files.createDirectories(uploadDir);
+
+                Path filePath = uploadDir.resolve(file.getOriginalFilename());
+                Files.write(filePath, file.getBytes());
+
+                imagePath = "/api/watches/images/" + file.getOriginalFilename();  // Store image URL
+            }
+
+            // Create watch object and save
+            Watch watch = new Watch();
+            watch.setName(name);
+            watch.setPrice(price);
+            watch.setImagePath(imagePath);
+
+            Watch savedWatch = watchService.addWatch(watch);
+            return ResponseEntity.ok(savedWatch);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWatch(@PathVariable int id) {

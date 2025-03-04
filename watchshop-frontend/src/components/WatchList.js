@@ -23,10 +23,11 @@ const WatchList = () => {
                             <strong>{watch.name}</strong> - ${watch.price}
                             <br />
                             <img
-                                src={`http://localhost:8080/api/images/${watch.imagePath.split('/').pop()}`}
+                                src={watch.imagePath ? `http://localhost:8080${watch.imagePath}` : "/default-image.jpg"}
                                 alt={watch.name}
                                 width="100"
                             />
+
                         </li>
                     ))
                 ) : (
@@ -38,4 +39,3 @@ const WatchList = () => {
 };
 
 export default WatchList;
-
