@@ -112,7 +112,7 @@ public class WatchController {
         }
     }
 
-    //Retrieves an image from the "uploads/" folder and serves it to the frontend
+    //Retrieves an image from the uploads folder and serves it to the frontend
     @GetMapping("/images/{filename}")
     public ResponseEntity<Resource> getImage(@PathVariable String filename) {
         try {

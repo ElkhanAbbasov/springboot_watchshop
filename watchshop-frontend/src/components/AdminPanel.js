@@ -56,11 +56,12 @@ const AdminPanel = () => {
     const deleteWatch = async (id) => {
         try {
             await axios.delete(`http://localhost:8080/api/watches/${id}`);
-            fetchWatches();
+            await fetchWatches();  // Ensure this line exists
         } catch (error) {
             console.error("Error deleting watch:", error);
         }
     };
+
 
     const startEdit = (watch) => {
         setEditWatch({ ...watch, price: watch.price.toString() });
@@ -93,12 +94,13 @@ const AdminPanel = () => {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            fetchWatches();
+            await fetchWatches();
             setEditWatch(null);
         } catch (error) {
             console.error("Error updating watch:", error);
         }
     };
+
 
     return (
         <div>
