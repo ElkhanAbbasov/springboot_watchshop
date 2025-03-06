@@ -130,4 +130,39 @@ public class WatchController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    // To edit the watches
+    @PutMapping("/{id}")
+    public ResponseEntity<Watch> updateWatch(
+            @PathVariable int id,
+            @RequestParam("name") String name,
+            @RequestParam("price") int price,
+            @RequestParam(value = "file", required = false) MultipartFile file) {
+        try {
+            Watch existingWatch = watchService.getWatchById(id);
+            if (existingWatch == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            existingWatch.setName(name);
+            existingWatch.setPrice(price);
+
+            if (file != null && !file.isEmpty()) {
+                Path uploadDir = Paths.get("").toAbsolutePath().resolve("uploads");
+                Files.createDirectories(uploadDir);
+
+                Path filePath = uploadDir.resolve(file.getOriginalFilename());
+                Files.write(filePath, file.getBytes());
+
+                existingWatch.setImagePath("/api/watches/images/" + file.getOriginalFilename());
+            }
+
+            Watch updatedWatch = watchService.addWatch(existingWatch); // this uses save() internally
+            return ResponseEntity.ok(updatedWatch);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
