@@ -3,7 +3,7 @@ import axios from "axios";
 
 const AdminPanel = () => {
     const [watches, setWatches] = useState([]);
-    const [newWatch, setNewWatch] = useState({ name: "", price: "", image: null });
+    const [newWatch, setNewWatch] = useState({ name: "", price: "", details: "", image: null });
     const [editWatch, setEditWatch] = useState(null);
 
     useEffect(() => {
@@ -28,40 +28,41 @@ const AdminPanel = () => {
     };
 
     const addWatch = async () => {
-        if (!newWatch.name || !newWatch.price) {
-            console.error("Name and price are required!");
+        console.log("Adding watch with data:", newWatch);
+
+        if (!newWatch.name || !newWatch.price || !newWatch.details) {
+            console.error("Name, price, and details are required!");
             return;
         }
 
         const formData = new FormData();
         formData.append("name", newWatch.name);
         formData.append("price", parseInt(newWatch.price, 10));
+        formData.append("details", newWatch.details);
         if (newWatch.image) {
             formData.append("file", newWatch.image);
         }
 
         try {
-            await axios.post("http://localhost:8080/api/watches/add", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
+            const response = await axios.post("http://localhost:8080/api/watches/add", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
+            console.log("Watch added successfully:", response.data);
             fetchWatches();
-            setNewWatch({ name: "", price: "", image: null });
+            setNewWatch({ name: "", price: "", details: "", image: null });
         } catch (error) {
-            console.error("Error adding watch:", error);
+            console.error("Error adding watch:", error.response ? error.response.data : error.message);
         }
     };
 
     const deleteWatch = async (id) => {
         try {
             await axios.delete(`http://localhost:8080/api/watches/${id}`);
-            await fetchWatches();  // Ensure this line exists
+            await fetchWatches();
         } catch (error) {
             console.error("Error deleting watch:", error);
         }
     };
-
 
     const startEdit = (watch) => {
         setEditWatch({ ...watch, price: watch.price.toString() });
@@ -101,7 +102,6 @@ const AdminPanel = () => {
         }
     };
 
-
     return (
         <div>
             <h2>Admin Panel - Manage Watches</h2>
@@ -120,6 +120,12 @@ const AdminPanel = () => {
                     name="price"
                     placeholder="Price"
                     value={newWatch.price}
+                    onChange={handleInputChange}
+                />
+                <textarea
+                    name="details"
+                    placeholder="Enter watch details..."
+                    value={newWatch.details}
                     onChange={handleInputChange}
                 />
                 <input type="file" onChange={handleFileChange} />
