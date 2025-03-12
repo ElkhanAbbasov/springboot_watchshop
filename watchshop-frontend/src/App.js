@@ -1,6 +1,8 @@
 import React from "react";
 import AdminPanel from "./components/AdminPanel";
 import UserPanel from "./components/UserPanel";
+import "./styles.css";
+
 
 function App() {
     return (
