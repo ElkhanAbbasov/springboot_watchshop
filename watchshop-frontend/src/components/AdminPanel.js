@@ -5,6 +5,7 @@ const AdminPanel = () => {
     const [watches, setWatches] = useState([]);
     const [newWatch, setNewWatch] = useState({ name: "", price: "", details: "", image: null });
     const [editWatch, setEditWatch] = useState(null);
+    const [expandedWatch, setExpandedWatch] = useState(null); // State for toggling details
 
     useEffect(() => {
         fetchWatches();
@@ -58,11 +59,12 @@ const AdminPanel = () => {
     const deleteWatch = async (id) => {
         try {
             await axios.delete(`http://localhost:8080/api/watches/${id}`);
-            await fetchWatches();
+            fetchWatches();  // Refresh the watch list
         } catch (error) {
-            console.error("Error deleting watch:", error);
+            console.error("Error deleting watch:", error.response ? error.response.data : error.message);
         }
     };
+
 
     const startEdit = (watch) => {
         setEditWatch({ ...watch, price: watch.price.toString() });
@@ -77,14 +79,15 @@ const AdminPanel = () => {
     };
 
     const updateWatch = async () => {
-        if (!editWatch.name || !editWatch.price) {
-            console.error("Name and price are required!");
+        if (!editWatch.name || !editWatch.price || !editWatch.details) {
+            console.error("Name, price, and details are required!");
             return;
         }
 
         const formData = new FormData();
         formData.append("name", editWatch.name);
         formData.append("price", parseInt(editWatch.price, 10));
+        formData.append("details", editWatch.details);
         if (editWatch.image) {
             formData.append("file", editWatch.image);
         }
@@ -147,6 +150,11 @@ const AdminPanel = () => {
                         value={editWatch.price}
                         onChange={handleEditInputChange}
                     />
+                    <textarea
+                        name="details"
+                        value={editWatch.details}
+                        onChange={handleEditInputChange}
+                    />
                     <input type="file" onChange={handleEditFileChange} />
                     <br />
                     <img
@@ -179,6 +187,15 @@ const AdminPanel = () => {
                             alt={watch.name}
                             width="100"
                         />
+                        <br />
+                        {/* Toggle Button for Viewing Details */}
+                        <button onClick={() => setExpandedWatch(expandedWatch === watch.id ? null : watch.id)}>
+                            {expandedWatch === watch.id ? "Hide Details" : "View Details"}
+                        </button>
+
+                        {/* Show Details only if expanded */}
+                        {expandedWatch === watch.id && <p>{watch.details}</p>}
+
                         <br />
                         <button onClick={() => startEdit(watch)}>Edit</button>
                         <button onClick={() => deleteWatch(watch.id)}>Delete</button>

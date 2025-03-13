@@ -18,6 +18,9 @@ public class Watch {
     @Column(name = "image_path")  // Store the file path, not the URL
     private String imagePath;
 
+    @Column(nullable = true, columnDefinition = "TEXT") // Add details column
+    private String details;
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -29,4 +32,7 @@ public class Watch {
 
     public String getImagePath() { return imagePath; }
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
+
+    public String getDetails() { return details; }
+    public void setDetails(String details) { this.details = details; }
 }

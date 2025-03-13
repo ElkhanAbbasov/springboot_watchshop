@@ -47,11 +47,11 @@ public class WatchController {
     public ResponseEntity<Watch> addWatch(
             @RequestParam("name") String name,
             @RequestParam("price") int price,
+            @RequestParam("details") String details, // Accept details
             @RequestParam(value = "file", required = false) MultipartFile file) {
         try {
             String imagePath = null;
 
-            // Save file if provided
             if (file != null && !file.isEmpty()) {
                 Path uploadDir = Paths.get("").toAbsolutePath().resolve("uploads");
                 Files.createDirectories(uploadDir);
@@ -59,13 +59,13 @@ public class WatchController {
                 Path filePath = uploadDir.resolve(file.getOriginalFilename());
                 Files.write(filePath, file.getBytes());
 
-                imagePath = "/api/watches/images/" + file.getOriginalFilename();  // Store image URL
+                imagePath = "/api/watches/images/" + file.getOriginalFilename();
             }
 
-            // Create watch object and save
             Watch watch = new Watch();
             watch.setName(name);
             watch.setPrice(price);
+            watch.setDetails(details); // Save details
             watch.setImagePath(imagePath);
 
             Watch savedWatch = watchService.addWatch(watch);
@@ -137,6 +137,7 @@ public class WatchController {
             @PathVariable int id,
             @RequestParam("name") String name,
             @RequestParam("price") int price,
+            @RequestParam("details") String details, // Accept details
             @RequestParam(value = "file", required = false) MultipartFile file) {
         try {
             Watch existingWatch = watchService.getWatchById(id);
@@ -146,6 +147,7 @@ public class WatchController {
 
             existingWatch.setName(name);
             existingWatch.setPrice(price);
+            existingWatch.setDetails(details); // Update details
 
             if (file != null && !file.isEmpty()) {
                 Path uploadDir = Paths.get("").toAbsolutePath().resolve("uploads");
@@ -157,12 +159,13 @@ public class WatchController {
                 existingWatch.setImagePath("/api/watches/images/" + file.getOriginalFilename());
             }
 
-            Watch updatedWatch = watchService.addWatch(existingWatch); // this uses save() internally
+            Watch updatedWatch = watchService.addWatch(existingWatch);
             return ResponseEntity.ok(updatedWatch);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
 }
